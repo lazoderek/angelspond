@@ -1,0 +1,23 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Arial Black, Arial, sans-serif;
+  background-color: white;
+  color: black;
+}
+
+/* Force all WordPress post content text to be white */
+.post-content, 
+.post-content * {
+    color: white !important;
+}
+
+/* Optional: make links white and underline on hover */
+.post-content a {
+    color: white !important;
+    text-decoration: underline;
+}
