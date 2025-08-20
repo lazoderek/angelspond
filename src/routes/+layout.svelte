@@ -2,6 +2,9 @@
 	import { onMount } from 'svelte';
 	import '../app.css';
 
+	import { cartCount } from '$lib/stores/cart';
+	import { page } from '$app/stores';
+
 	let scWidget: any = null;
 	let isPlaying = false;
 	let currentTime = 0;
@@ -53,7 +56,7 @@
 		<img src="/logo.png" alt="Angels Pond Logo" class="h-60 w-auto max-w-full" />
 	</header>
 
-	<nav class="py-4">
+	<nav class="sticky top-0 z-40 py-4">
 		<div class="relative mx-auto flex max-w-5xl items-center justify-center">
 			<ul class="flex space-x-8 font-sans text-lg font-semibold text-white">
 				<li><a href="/" class="hover:underline">Home</a></li>
@@ -61,6 +64,12 @@
 				<li><a href="/media" class="hover:underline">Media</a></li>
 				<li><a href="/contact" class="hover:underline">Contact</a></li>
 			</ul>
+			{#if $page.url.pathname.startsWith('/shop') && $cartCount > 0}
+				<a href="/cart" aria-label="View cart" class="absolute right-45 top-1/2 -translate-y-1/2">
+					<img src="/cart.svg" alt="Cart" class="h-6 w-6 invert filter" />
+					<span class="absolute -top-2 -right-2 rounded-full bg-red-500 px-1 text-xs">{$cartCount}</span>
+				</a>
+			{/if}
 		</div>
 	</nav>
 
@@ -77,35 +86,81 @@
 		frameborder="0"
 		allow="autoplay"
 		class="hidden"
+		title="audio player"
 	></iframe>
 
-	<div class="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center space-x-4 rounded bg-black/80 p-3">
-		<button on:click={prevTrack} class="text-white">
-			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+	<div
+		class="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center space-x-4 rounded bg-black/80 p-3"
+	>
+		<!-- Previous track button -->
+		<button on:click={prevTrack} class="text-white" aria-label="Previous track">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke-width="1.5"
+				stroke="currentColor"
+				class="h-6 w-6"
+				aria-hidden="true"
+			>
 				<path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
 			</svg>
 		</button>
 
 		<button on:click={togglePlay} class="text-white">
 			{#if isPlaying}
-				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke-width="1.5"
+					stroke="currentColor"
+					class="h-6 w-6"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M15.75 5.25v13.5m-7.5-13.5v13.5"
+					/>
 				</svg>
 			{:else}
-				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke-width="1.5"
+					stroke="currentColor"
+					class="h-6 w-6"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
+					/>
 				</svg>
 			{/if}
 		</button>
 
-		<button on:click={nextTrack} class="text-white">
-			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+		<!-- Next track button -->
+		<button on:click={nextTrack} class="text-white" aria-label="Next track">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke-width="1.5"
+				stroke="currentColor"
+				class="h-6 w-6"
+				aria-hidden="true"
+			>
 				<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
 			</svg>
 		</button>
 
 		<div class="h-2 w-full overflow-hidden rounded bg-gray-700">
-			<div class="h-2 rounded bg-red-500" style="width: {duration ? Math.min((currentTime / duration) * 100, 100) : 0}%"></div>
+			<div
+				class="h-2 rounded bg-red-500"
+				style="width: {duration ? Math.min((currentTime / duration) * 100, 100) : 0}%"
+			></div>
 		</div>
 
 		<div class="mt-1 text-center text-xs whitespace-nowrap text-gray-300">

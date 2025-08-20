@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { addToCart } from '$lib/stores/cart';
 
 	export let data: PageData;
 	const product = data.product;
@@ -8,7 +9,7 @@
 	let selectedOptions: Record<string, string> = {};
 	if (product?.options) {
 		for (const opt of product.options) {
-			selectedOptions[opt.name] = opt.values[0]; // default to first value
+			selectedOptions[opt.name] = opt.values[0]; // default
 		}
 	}
 
@@ -30,9 +31,18 @@
 		if (event.key === 'Escape') enlarged = null;
 	}
 
-	function addToCart(item: { id: string; title: string }) {
-		// Placeholder for now
-		console.log('Add to cart:', item);
+	// Add to Cart handler
+	function addToCartHandler() {
+		const variant = getSelectedVariant();
+		if (!variant) return;
+
+		addToCart({
+			id: variant.id ?? product!.handle,
+			title: product!.title,
+			price: parseFloat(variant.price.amount ?? '0'),
+			quantity: 1,
+			image: selectedImage
+		});
 	}
 </script>
 
@@ -87,8 +97,7 @@
 
 				<button
 					class="mt-2 w-40 bg-white px-3 py-1 text-xs text-black hover:bg-gray-100"
-					on:click={() =>
-						addToCart({ id: getSelectedVariant()?.id ?? product.handle, title: product.title })}
+					on:click={addToCartHandler}
 				>
 					Add to Cart
 				</button>
