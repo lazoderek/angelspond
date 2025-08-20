@@ -12,8 +12,16 @@ export const load: PageServerLoad = async () => {
 					id
 					title
 					handle
-					variants(first: 1) { edges { node { price { amount } } } }
 					images(first: 1) { edges { node { url } } }
+					variants(first: 10) {
+						edges {
+							node {
+								id
+								price { amount }
+								availableForSale
+							}
+						}
+					}
 				}
 			}
 		}
@@ -35,8 +43,12 @@ export const load: PageServerLoad = async () => {
 			id: node.id,
 			title: node.title,
 			handle: node.handle,
-			price: node.variants.edges[0]?.node.price.amount || '',
-			image: node.images.edges[0]?.node.url || ''
+			image: node.images.edges[0]?.node.url || null,
+			variants: node.variants.edges.map((v: any) => ({
+				id: v.node.id,
+				price: v.node.price.amount,
+				availableForSale: v.node.availableForSale
+			}))
 		}));
 
 		return { products };

@@ -31,9 +31,10 @@ export const load: PageServerLoad = async ({ params }) => {
 				variants(first: 10) {
 					edges {
 						node {
-							id
-							price { amount }
-							selectedOptions { name value }
+						id
+						price { amount }
+						availableForSale
+						selectedOptions { name value }
 						}
 					}
 				}

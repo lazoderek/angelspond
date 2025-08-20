@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { addToCart } from '$lib/stores/cart';
+	import { addToCart, addToCartShopify } from '$lib/stores/cart';
 
 	export let data: PageData;
 	const product = data.product;
@@ -9,7 +9,7 @@
 	let selectedOptions: Record<string, string> = {};
 	if (product?.options) {
 		for (const opt of product.options) {
-			selectedOptions[opt.name] = opt.values[0]; // default
+			selectedOptions[opt.name] = opt.values[0];
 		}
 	}
 
@@ -23,7 +23,6 @@
 		);
 	}
 
-	// Track main + enlarged image
 	let selectedImage = product?.image ?? product?.images?.[0] ?? null;
 	let enlarged: string | null = null;
 
@@ -31,11 +30,20 @@
 		if (event.key === 'Escape') enlarged = null;
 	}
 
+	// Check if the product is sold out
+	function isSoldOut(product: any) {
+		return product.variants?.every((v: any) => !v.availableForSale);
+	}
+
 	// Add to Cart handler
-	function addToCartHandler() {
+	async function addToCartHandler() {
 		const variant = getSelectedVariant();
 		if (!variant) return;
 
+		// Update Shopify cart
+		await addToCartShopify(variant.id, 1);
+
+		// Update local store so UI is responsive
 		addToCart({
 			id: variant.id ?? product!.handle,
 			title: product!.title,
@@ -47,14 +55,18 @@
 </script>
 
 <main class="mx-auto max-w-6xl p-6 text-white">
-	{#if !product}
-		<p class="mx-auto mt-8 text-white">Product not found.</p>
+	{#if !product || isSoldOut(product)}
+		<p class="mx-auto mt-8 text-center text-lg text-white">Product Not Available</p>
 	{:else}
 		<div class="flex flex-col space-y-6 md:flex-row md:space-x-8">
 			<!-- Left: Images -->
 			<div class="flex w-full max-w-md flex-shrink-0 flex-col space-y-2">
 				{#if selectedImage}
-					<button type="button" class="aspect-square overflow-hidden border border-white" on:click={() => (enlarged = selectedImage)}>
+					<button
+						type="button"
+						class="aspect-square overflow-hidden border border-white"
+						on:click={() => (enlarged = selectedImage)}
+					>
 						<img src={selectedImage} alt={product.title} class="h-full w-full object-cover" />
 					</button>
 				{/if}
@@ -62,7 +74,11 @@
 				{#if product.images?.length > 1}
 					<div class="mt-2 flex space-x-2">
 						{#each product.images as img}
-							<button type="button" class="aspect-square w-20 overflow-hidden border border-white/30 hover:border-white" on:click={() => (selectedImage = img)}>
+							<button
+								type="button"
+								class="aspect-square w-20 overflow-hidden border border-white/30 hover:border-white"
+								on:click={() => (selectedImage = img)}
+							>
 								<img src={img} alt="" class="h-full w-full object-cover" />
 							</button>
 						{/each}
@@ -88,7 +104,9 @@
 								on:change={(e) => selectOption(opt.name, e.currentTarget.value)}
 							>
 								{#each opt.values as val}
-									<option value={val}>{val}</option>
+									{#if product.variants.some((v: any) => v.selectedOptions?.some((so: any) => so.name === opt.name && so.value === val) && v.availableForSale)}
+										<option value={val}>{val}</option>
+									{/if}
 								{/each}
 							</select>
 						</div>
@@ -106,8 +124,19 @@
 
 		<!-- Modal for enlarged image -->
 		{#if enlarged}
-			<div role="dialog" aria-modal="true" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80" on:click={() => (enlarged = null)} on:keydown={handleKeydown} tabindex="0">
-				<img src={enlarged} alt="" class="max-h-[70vh] max-w-[70vw] border border-white shadow-2xl" />
+			<div
+				role="dialog"
+				aria-modal="true"
+				class="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+				on:click={() => (enlarged = null)}
+				on:keydown={handleKeydown}
+				tabindex="0"
+			>
+				<img
+					src={enlarged}
+					alt=""
+					class="max-h-[70vh] max-w-[70vw] border border-white shadow-2xl"
+				/>
 			</div>
 		{/if}
 
