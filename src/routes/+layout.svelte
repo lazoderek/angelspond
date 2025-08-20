@@ -56,7 +56,7 @@
 		<img src="/logo.png" alt="Angels Pond Logo" class="h-60 w-auto max-w-full" />
 	</header>
 
-	<nav class="sticky top-0 z-40 py-4">
+	<nav class="z-40 py-4">
 		<div class="relative mx-auto flex max-w-5xl items-center justify-center">
 			<ul class="flex space-x-8 font-sans text-lg font-semibold text-white">
 				<li><a href="/" class="hover:underline">Home</a></li>

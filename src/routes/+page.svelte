@@ -8,7 +8,7 @@
 	// Decode HTML titles only on client to handle &nbsp; etc.
 	onMount(() => {
 		const txt = document.createElement('textarea');
-		posts = posts.map(post => ({
+		posts = posts.map((post) => ({
 			...post,
 			title: (() => {
 				txt.innerHTML = post.title;
@@ -33,21 +33,21 @@
 	{#each posts as post, i}
 		<article class="mx-auto mb-12 max-w-4xl text-white">
 			<!-- Big blog heading -->
-			<h2 class="mb-4 text-2xl font-bold">{post.title}</h2>
+			<h2 class="mb-1 text-2xl font-bold">{post.title}</h2>
+
+			{#if post.title && post.date}
+				<p class="mb-4 font-mono text-xs tracking-wider text-gray-400 uppercase">
+					{new Date(post.date).toISOString().split('T')[0]}
+				</p>
+			{/if}
 
 			{#if post.images && post.images.length > 0}
-				<!-- Main image (square container, portrait/landscape fit) -->
-				<div class="mb-2 w-full flex justify-center">
-					<div class="relative w-full max-w-full aspect-square flex items-center justify-center">
-						<img
-							src={selectedImages[i]!}
-							alt=""
-							class="max-w-full max-h-full object-contain"
-						/>
+				<div class="mb-2 flex w-full justify-center">
+					<div class="relative flex aspect-square w-full max-w-full items-center justify-center">
+						<img src={selectedImages[i]!} alt="" class="max-h-full max-w-full object-contain" />
 					</div>
 				</div>
 
-				<!-- Thumbnails -->
 				{#if post.images.length > 1}
 					<div class="mb-4 flex space-x-2">
 						{#each post.images as img}
@@ -63,8 +63,7 @@
 				{/if}
 			{/if}
 
-			<!-- WordPress content preserved exactly -->
-			<div class="prose prose-invert max-w-none">
+			<div class="prose max-w-none prose-invert">
 				{@html post.content}
 			</div>
 		</article>
