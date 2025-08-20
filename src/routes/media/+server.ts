@@ -10,19 +10,25 @@ const auth = new google.auth.GoogleAuth({
 const drive = google.drive({ version: 'v3', auth });
 const FOLDER_ID = '1afkTw339ANHnlZVkiPLBWaItNQ0NRTVl';
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ url }) => {
     try {
-        const res = await drive.files.list({
-            q: `'${FOLDER_ID}' in parents and mimeType contains 'image/'`,
-            fields: 'files(id, name)',
-            orderBy: 'name'
+        const fileId = url.searchParams.get('id');
+        if (!fileId) {
+            return new Response(JSON.stringify({ error: 'Missing file ID' }), { status: 400 });
+        }
+
+        const res = await drive.files.get(
+            { fileId, alt: 'media' },
+            { responseType: 'arraybuffer' }
+        );
+
+        // Optional: dynamically detect MIME type (default to image/jpeg)
+        const mimeType = 'image/jpeg';
+
+        return new Response(res.data, {
+            status: 200,
+            headers: { 'Content-Type': mimeType }
         });
-
-        const files = res.data.files ?? [];
-
-        const urls = files.map(file => `https://drive.google.com/uc?export=view&id=${file.id}`);
-
-        return new Response(JSON.stringify(urls), { status: 200 });
     } catch (err) {
         console.error(err);
         return new Response(JSON.stringify({ error: 'Failed to fetch media' }), { status: 500 });
