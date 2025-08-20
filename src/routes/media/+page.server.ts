@@ -8,7 +8,7 @@ const auth = new google.auth.GoogleAuth({
 });
 
 const drive = google.drive({ version: 'v3', auth });
-const FOLDER_ID = '1afkTw339ANHnlZVkiPLBWaItNQ0NRTVl';
+const FOLDER_ID = '1sXE1cFFyo9Qv7SaA0Ho_2C2bqp6oftHB';
 
 export const load: PageServerLoad = async () => {
     try {
