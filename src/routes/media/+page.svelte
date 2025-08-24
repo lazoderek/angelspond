@@ -3,6 +3,9 @@
 	let images = data.images;
 	let selected: string | null = null;
 
+	// keep track of which images are loaded
+	let loaded: Record<string, boolean> = {};
+
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') selected = null;
 	}
@@ -21,7 +24,9 @@
 					src={img}
 					alt=""
 					loading="lazy"
-					class="h-auto w-full cursor-pointer border border-white/30 transition-opacity duration-200 ease-in-out hover:opacity-90"
+					on:load={() => (loaded[img] = true)}
+					class="h-auto w-full cursor-pointer transition-opacity duration-200 ease-in-out hover:opacity-90
+						   {loaded[img] ? 'border border-white/30 opacity-100' : 'opacity-0'}"
 				/>
 			</button>
 		{/each}
