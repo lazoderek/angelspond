@@ -1,10 +1,11 @@
 <script lang="ts">
-	export let data: { images: string[] };
-	let images = data.images;
+	export let data: { media: { url: string; mimeType: string }[] };
+	let media = data?.media ?? [];
 	let selected: string | null = null;
 
-	// keep track of which images are loaded
+	// track loaded state
 	let loaded: Record<string, boolean> = {};
+	for (const m of media) loaded[m.url] = false;
 
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') selected = null;
@@ -13,21 +14,34 @@
 
 <main class="mx-auto mb-8 max-w-4xl bg-transparent p-6 font-sans text-white">
 	<div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
-		{#each images as img}
+		{#each media as m}
 			<button
 				type="button"
-				class="bg-transparent p-0 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none"
-				on:click={() => (selected = img)}
-				aria-label="Open image"
+				class="p-0 focus:ring-offset-2 focus:outline-none"
+				on:click={() => (selected = m.url)}
+				aria-label="Open media"
 			>
-				<img
-					src={img}
-					alt=""
-					loading="lazy"
-					on:load={() => (loaded[img] = true)}
-					class="h-auto w-full cursor-pointer transition-opacity duration-200 ease-in-out hover:opacity-90
-						   {loaded[img] ? 'border border-white/30 opacity-100' : 'opacity-0'}"
-				/>
+				<div class="relative w-full" style="padding-top: 125%;">
+					{#if m.mimeType.startsWith('video/')}
+						<video
+							src={m.url}
+							muted
+							playsinline
+							class="absolute top-0 left-0 block h-full w-full object-cover"
+							style="border: {loaded[m.url] ? '1px solid rgba(255,255,255,0.3)' : 'none'}"
+							on:loadeddata={() => (loaded[m.url] = true)}
+						/>
+					{:else}
+						<img
+							src={m.url}
+							alt=""
+							loading="lazy"
+							class="absolute top-0 left-0 block h-full w-full object-cover"
+							style="border: {loaded[m.url] ? '1px solid rgba(255,255,255,0.3)' : 'none'}"
+							on:load={() => (loaded[m.url] = true)}
+						/>
+					{/if}
+				</div>
 			</button>
 		{/each}
 	</div>
@@ -41,7 +55,11 @@
 			on:keydown={handleKeydown}
 			tabindex="0"
 		>
-			<img src={selected} alt="" class="max-h-[70vh] max-w-[70vw] border border-white shadow-2xl" />
+			{#if media.find((m) => m.url === selected)?.mimeType.startsWith('video/')}
+				<video src={selected} controls autoplay class="max-h-[70vh] max-w-[70vw] shadow-2xl" />
+			{:else}
+				<img src={selected} alt="" class="max-h-[70vh] max-w-[70vw] shadow-2xl" />
+			{/if}
 		</div>
 	{/if}
 </main>
