@@ -48,6 +48,15 @@
 	const prevTrack = () => scWidget?.prev();
 </script>
 
+<!-- Ensure the body and html have a dark background -->
+<svelte:head>
+	<style>
+		html, body {
+			background-color: #1a1a1a; /* dark grey */
+		}
+	</style>
+</svelte:head>
+
 <div
 	class="min-h-screen bg-cover bg-fixed bg-center bg-no-repeat text-white"
 	style="background-image: url('/background.png');"
