@@ -79,7 +79,9 @@ export async function createShopifyCart() {
 	}`;
 	const data = await shopifyRequest(query);
 	shopifyCartId = data.data.cartCreate.cart.id;
-	if (typeof localStorage !== 'undefined') localStorage.setItem('shopifyCartId', shopifyCartId);
+	if (typeof localStorage !== 'undefined' && shopifyCartId) {
+		localStorage.setItem('shopifyCartId', shopifyCartId);
+	}
 	checkoutUrl.set(data.data.cartCreate.cart.checkoutUrl);
 	return data.data.cartCreate.cart;
 }

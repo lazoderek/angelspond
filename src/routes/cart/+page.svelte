@@ -1,6 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { cart, removeFromCart, updateQuantity, clearCart, getCartCheckoutUrl } from '$lib/stores/cart';
+	import {
+		cart,
+		removeFromCart,
+		updateQuantity,
+		clearCart,
+		getCartCheckoutUrl
+	} from '$lib/stores/cart';
 	import { writable } from 'svelte/store';
 
 	let checkoutUrl = writable<string | null>(null);
@@ -17,7 +23,7 @@
 </script>
 
 <main class="mx-auto max-w-4xl p-6 text-white">
-	<h1 class="text-xl mb-4">Cart</h1>
+	<h1 class="mb-4 text-xl">Cart</h1>
 
 	{#if $cart.length === 0}
 		<p>Your cart is empty.</p>
@@ -31,35 +37,32 @@
 						<div class="flex items-center space-x-2">
 							<!-- Quantity controls -->
 							<button
-								class="px-2 py-1 bg-gray-700 text-xs"
+								class="bg-gray-700 px-2 py-1 text-xs"
 								on:click={() => updateQuantity(item.id, item.quantity - 1)}
 							>
 								-
 							</button>
 							<span class="text-sm">{item.quantity}</span>
 							<button
-								class="px-2 py-1 bg-gray-700 text-xs"
+								class="bg-gray-700 px-2 py-1 text-xs"
 								on:click={() => updateQuantity(item.id, item.quantity + 1)}
 							>
 								+
 							</button>
 
 							<!-- Remove button -->
-							<button
-								class="px-2 py-1 bg-red-600 text-xs"
-								on:click={() => removeFromCart(item.id)}
-							>
+							<button class="bg-red-600 px-2 py-1 text-xs" on:click={() => removeFromCart(item.id)}>
 								Remove
 							</button>
 						</div>
 					</div>
 
 					<!-- Price -->
-					<p class="font-semibold text-right">${item.price * item.quantity}</p>
+					<p class="text-right font-semibold">${item.price * item.quantity}</p>
 
 					<!-- Product Image (click to enlarge) -->
 					{#if item.image}
-						<button on:click={() => (selectedImage = item.image)}>
+						<button on:click={() => (selectedImage = item.image ?? null)}>
 							<img src={item.image} alt={item.title} class="h-16 w-16 object-cover" />
 						</button>
 					{/if}
@@ -67,16 +70,14 @@
 			{/each}
 		</ul>
 
-		<div class="mt-6 flex justify-between items-center">
-			<button class="bg-gray-700 px-3 py-1 text-xs" on:click={clearCart}>
-				Clear Cart
-			</button>
+		<div class="mt-6 flex items-center justify-between">
+			<button class="bg-gray-700 px-3 py-1 text-xs" on:click={clearCart}> Clear Cart </button>
 
 			<a
 				href={$checkoutUrl ?? '#'}
 				target="_blank"
 				rel="noopener noreferrer"
-				class="bg-white text-black px-3 py-1 text-xs"
+				class="bg-white px-3 py-1 text-xs text-black"
 				class:opacity-50={$checkoutUrl === null}
 				class:pointer-events-none={$checkoutUrl === null}
 			>

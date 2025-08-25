@@ -6,7 +6,12 @@
 	const products = data.products;
 
 	// Track selected image per product
-	let selectedImages: (string | null)[] = products.map((p) => p.image);
+	interface Product {
+		image?: string | null;
+		// add other fields if needed
+	}
+
+	let selectedImages: (string | null)[] = products.map((p: Product) => p.image ?? null);
 
 	// Check if product is sold out
 	function isSoldOut(product: any) {
@@ -20,35 +25,36 @@
 	{:else}
 		<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
 			{#each products as product, i}
-				<div class="relative flex flex-col space-y-2 group">
+				<div class="group relative flex flex-col space-y-2">
 					<!-- Entire product card -->
 					<div
-						class="cursor-pointer group"
+						class="group cursor-pointer"
+						role="button"
+						tabindex="0"
 						on:click={() => !isSoldOut(product) && goto(`/shop/${product.handle}`)}
+						on:keydown={(e) =>
+							e.key === 'Enter' && !isSoldOut(product) && goto(`/shop/${product.handle}`)}
 					>
 						<!-- Main image -->
 						{#if selectedImages[i]}
 							<div
-								class="relative w-full aspect-square overflow-hidden border border-transparent group-hover:border-white transition-all duration-150"
+								class="relative aspect-square w-full overflow-hidden border border-transparent transition-all duration-150 group-hover:border-white"
 							>
 								<img
 									src={selectedImages[i]!}
 									alt={product.title}
-									class="w-full h-full object-cover"
+									class="h-full w-full object-cover"
 								/>
 							</div>
 						{/if}
 
 						<!-- Product title with Sold Out badge -->
-						<div class="mt-2 flex justify-between items-center">
-							<h2
-								class="text-lg truncate"
-								class:text-gray-500={isSoldOut(product)}
-							>
+						<div class="mt-2 flex items-center justify-between">
+							<h2 class="truncate text-lg" class:text-gray-500={isSoldOut(product)}>
 								{product.title}
 							</h2>
 							{#if isSoldOut(product)}
-								<span class="ml-2 text-xs bg-red-600 px-2 py-1 text-white whitespace-nowrap">
+								<span class="ml-2 bg-red-600 px-2 py-1 text-xs whitespace-nowrap text-white">
 									Sold Out
 								</span>
 							{/if}

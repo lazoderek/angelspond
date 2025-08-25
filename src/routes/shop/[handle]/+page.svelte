@@ -103,8 +103,13 @@
 								bind:value={selectedOptions[opt.name]}
 								on:change={(e) => selectOption(opt.name, e.currentTarget.value)}
 							>
-								{#each opt.values as val}
-									{#if product.variants.some((v: any) => v.selectedOptions?.some((so: any) => so.name === opt.name && so.value === val) && v.availableForSale)}
+								{#each opt.values as val (val)}
+									{#if product.variants?.some(
+										(v: any) =>
+											v.selectedOptions?.some(
+												(so: any) => so.name === opt.name && so.value === val
+											) && v.availableForSale
+									)}
 										<option value={val}>{val}</option>
 									{/if}
 								{/each}

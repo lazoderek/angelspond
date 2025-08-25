@@ -30,7 +30,7 @@
 							class="absolute top-0 left-0 block h-full w-full object-cover"
 							style="border: {loaded[m.url] ? '1px solid rgba(255,255,255,0.3)' : 'none'}"
 							on:loadeddata={() => (loaded[m.url] = true)}
-						/>
+						></video>
 					{:else}
 						<img
 							src={m.url}
@@ -56,7 +56,9 @@
 			tabindex="0"
 		>
 			{#if media.find((m) => m.url === selected)?.mimeType.startsWith('video/')}
-				<video src={selected} controls autoplay class="max-h-[70vh] max-w-[70vw] shadow-2xl" />
+				<video src={selected} controls autoplay class="max-h-[70vh] max-w-[70vw] shadow-2xl" >
+					<track kind="captions" />
+				</video>
 			{:else}
 				<img src={selected} alt="" class="max-h-[70vh] max-w-[70vw] shadow-2xl" />
 			{/if}

@@ -22,7 +22,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
         // Fetch file content
         const res = await drive.files.get({ fileId, alt: 'media' }, { responseType: 'arraybuffer' });
-        let buffer = Buffer.from(res.data as ArrayBuffer);
+        let buffer = Buffer.from(res.data as any);
 
         // If HEIC, convert to JPEG
         let contentType = mimeType;
